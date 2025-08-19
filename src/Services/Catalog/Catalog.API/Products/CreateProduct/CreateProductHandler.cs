@@ -1,5 +1,4 @@
-﻿
-
+﻿ 
 namespace Catalog.API.Products.CreateProduct
 {
 
@@ -7,13 +6,13 @@ namespace Catalog.API.Products.CreateProduct
         :ICommand<CreateProductResult>;
     public record CreateProductResult(Guid Id);
 
-    internal class CreateProductHandler(IDocumentSession session) : ICommandHandler<CreateProductCommand, CreateProductResult>
+    internal class CreateProductCommandHandler(IDocumentSession session) : ICommandHandler<CreateProductCommand, CreateProductResult>
     {
         public async Task<CreateProductResult> Handle(CreateProductCommand command, CancellationToken cancellationToken)
         {
             //create Product entity from command Object
             //save to DB
-            //return CreateProduct result
+            //return CreateProduct result 
 
             //Create Product Entity
             var product = new Product
