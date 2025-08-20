@@ -3,7 +3,7 @@ using BuildingBlocks.CQRS;
 using FluentValidation;
 using MediatR;
 
-namespace BuildingBlocks.Behaviours
+namespace BuildingBlocks.Behaviors
 {
     public class ValidationBehaviour<TRequest, TResponse> 
         (IEnumerable<IValidator<TRequest>> validators)

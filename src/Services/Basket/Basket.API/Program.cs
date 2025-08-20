@@ -1,18 +1,16 @@
 
 
-using BuildingBlocks.Behaviors; 
+using Basket.API.Data;
 using BuildingBlocks.Exceptions.Handler;
-using Catalog.API.Data;
+using FluentValidation;
 using HealthChecks.UI.Client;
-using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to Container
-var assembly = typeof(Program).Assembly;
+builder.Services.AddCarter();
 
+var assembly = typeof(Program).Assembly;
 builder.Services.AddMediatR(config =>
 {
     config.RegisterServicesFromAssembly(assembly);
@@ -21,7 +19,6 @@ builder.Services.AddMediatR(config =>
 });
 builder.Services.AddValidatorsFromAssembly(assembly);
 
-builder.Services.AddCarter();
 builder.Services.AddMarten(options =>
 
 {
@@ -29,26 +26,27 @@ builder.Services.AddMarten(options =>
 
 }).UseLightweightSessions();
 
-if(builder.Environment.IsDevelopment())
-{
-    builder.Services.InitializeMartenWith<CatalogInitialData>();
-}
+builder.Services.AddStackExchangeRedisCache(options => {
+    options.Configuration = builder.Configuration.GetConnectionString("Redis");
+});
 
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 
+builder.Services.AddScoped<IBasketRepository, BasketRepository>();
+builder.Services.Decorate<IBasketRepository, CashedBasketRepository>();
+
 builder.Services.AddHealthChecks()
-    .AddNpgSql(builder.Configuration.GetConnectionString("Database")!);
+    .AddNpgSql(builder.Configuration.GetConnectionString("Database")!)
+    .AddRedis(builder.Configuration.GetConnectionString("Redis")!);
 
 var app = builder.Build();
 
-// Configure the Http Request pipeline
 app.MapCarter();
-
 app.UseExceptionHandler(opt => { });
 
-app.UseHealthChecks("/health",new HealthCheckOptions
+app.UseHealthChecks("/health", new HealthCheckOptions
 {
-    ResponseWriter=UIResponseWriter.WriteHealthCheckUIResponse
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
 });
 
 app.Run();
