@@ -6,7 +6,7 @@ namespace Ordering.Domain.Models
     {
         private readonly List<OrderItem> _orderItems = new();
 
-        public IReadOnlyList<OrderItem> orderItems { get { return _orderItems.AsReadOnly(); } }
+        public IReadOnlyList<OrderItem> OrderItems { get { return _orderItems.AsReadOnly(); } }
 
         public CustomerId CustomerId { get; private set; } = default!;
         public OrderName OrderName { get; private set; } = default!;
